@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Googly – Cricket Prediction Arena (demo coins)</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Figtree:wght@400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #eaf3f6;
+      --sf: #fff;
+      --sf2: #f0f7fa;
+      --ink: #0a1a24;
+      --mute: #587386;
+      --line: #cfdfe6;
+      --acc: #0a8aa6;
+      --hot: #e8512e;
+      --gold: #b7800a;
+      --good: #12935f;
+      --bad: #d33a52;
+      --onacc: #fff;
+      box-sizing: border-box;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: env(safe-area-inset-bottom, 0px)
+    }
+
+    @media (prefers-color-scheme:dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #0a1a24;
+        --sf: #11293a;
+        --sf2: #17384d;
+        --ink: #eef3f5;
+        --mute: #8fa7b5;
+        --line: #1f4157;
+        --acc: #2bc4e6;
+        --hot: #ff6b4a;
+        --gold: #ffc857;
+        --good: #3ddc97;
+        --bad: #ff5d73;
+        --onacc: #06212b
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #0a1a24;
+      --sf: #11293a;
+      --sf2: #17384d;
+      --ink: #eef3f5;
+      --mute: #8fa7b5;
+      --line: #1f4157;
+      --acc: #2bc4e6;
+      --hot: #ff6b4a;
+      --gold: #ffc857;
+      --good: #3ddc97;
+      --bad: #ff5d73;
+      --onacc: #06212b
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-padding-top: env(safe-area-inset-top, 0px)
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.5 Figtree, system-ui, sans-serif
+    }
+
+    h1,
+    h2,
+    h3,
+    .disp {
+      font-family: Unbounded, Figtree, system-ui, sans-serif;
+      margin: 0;
+      font-weight: 700
+    }
+
+    button,
+    input {
+      font: inherit
+    }
+
+    button {
+      cursor: pointer
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--acc);
+      outline-offset: 2px
+    }
+
+    .hide {
+      display: none !important
+    }
+
+    .mut {
+      color: var(--mute);
+      font-size: 14px;
+      margin: 0
+    }
+
+    .btn {
+      background: var(--acc);
+      color: var(--onacc);
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-weight: 700
+    }
+
+    .btn:disabled {
+      opacity: .45;
+      cursor: not-allowed
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--line)
+    }
+
+    .wide {
+      width: 100%;
+      margin-top: 14px
+    }
+
+    .err {
+      color: var(--bad);
+      font-size: 14px;
+      min-height: 20px;
+      margin-top: 8px
+    }
+
+    /* auth */
+    .auth {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1.1fr 1fr
+    }
+
+    .brand {
+      background: linear-gradient(160deg, #0b2b3b, #0a1a24 70%);
+      color: #eef3f5;
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+      position: relative;
+      overflow: hidden
+    }
+
+    .brand h1 {
+      font-size: clamp(34px, 5.4vw, 60px);
+      line-height: 1.05;
+      max-width: 10em
+    }
+
+    .brand p {
+      max-width: 30em;
+      opacity: .8
+    }
+
+    .arc {
+      position: absolute;
+      right: -90px;
+      top: -90px;
+      width: 340px;
+      height: 340px;
+      border-radius: 50%;
+      border: 2px dashed #2bc4e680
+    }
+
+    .arc::after {
+      content: "";
+      position: absolute;
+      inset: 60px;
+      border-radius: 50%;
+      border: 2px solid #ff6b4a99
+    }
+
+    .tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap
+    }
+
+    .tags span {
+      border: 1px solid #ffffff40;
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 14px
+    }
+
+    .formside {
+      display: grid;
+      place-items: center;
+      padding: 28px
+    }
+
+    .fcard {
+      width: 100%;
+      max-width: 380px
+    }
+
+    .tabs {
+      display: flex;
+      background: var(--sf2);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 18px
+    }
+
+    .tabs button {
+      flex: 1;
+      border: 0;
+      background: transparent;
+      color: var(--mute);
+      padding: 8px;
+      border-radius: 9px;
+      font-weight: 700
+    }
+
+    .tabs button[aria-selected="true"] {
+      background: var(--sf);
+      color: var(--ink)
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 14px;
+      margin: 12px 0 4px
+    }
+
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--line);
+      background: var(--sf);
+      color: var(--ink)
+    }
+
+    .fine {
+      font-size: 13px;
+      color: var(--mute);
+      margin-top: 16px
+    }
+
+    @media(max-width:780px) {
+      .auth {
+        grid-template-columns: 1fr
+      }
+
+      .brand {
+        padding: 28px
+      }
+    }
+
+    /* shell */
+    .shell {
+      display: grid;
+      grid-template-columns: 232px 1fr;
+      min-height: 100vh
+    }
+
+    .side {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      border-right: 1px solid var(--line);
+      background: var(--sf)
+    }
+
+    .logo {
+      font-family: Unbounded, sans-serif;
+      font-weight: 700;
+      font-size: 22px;
+      padding: 4px 12px 16px
+    }
+
+    .logo b {
+      color: var(--hot)
+    }
+
+    .side button {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 0;
+      background: transparent;
+      color: var(--mute);
+      font-weight: 600;
+      text-align: left
+    }
+
+    .side button.on {
+      background: var(--sf2);
+      color: var(--ink);
+      box-shadow: inset 3px 0 var(--acc)
+    }
+
+    .side .sp {
+      flex: 1
+    }
+
+    .main {
+      padding: 18px 22px 40px;
+      min-width: 0
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 16px
+    }
+
+    .top h1 {
+      font-size: 22px
+    }
+
+    .right {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .pill {
+      background: var(--sf);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--mute)
+    }
+
+    .pill b {
+      color: var(--ink);
+      font-family: Unbounded, sans-serif;
+      font-size: 14px;
+      margin-left: 4px
+    }
+
+    .ico {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      background: var(--sf);
+      color: var(--ink)
+    }
+
+    .tabbar {
+      display: none
+    }
+
+    @media(max-width:860px) {
+      .shell {
+        grid-template-columns: 1fr
+      }
+
+      .side {
+        display: none
+      }
+
+      .main {
+        padding: 14px 14px 96px
+      }
+
+      .tabbar {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: var(--sf);
+        border-top: 1px solid var(--line);
+        padding: 6px 4px calc(6px + env(safe-area-inset-bottom, 0px));
+        z-index: 5
+      }
+
+      .tabbar button {
+        background: transparent;
+        border: 0;
+        color: var(--mute);
+        font-size: 12px;
+        font-weight: 600;
+        display: grid;
+        gap: 2px;
+        place-items: center;
+        padding: 4px
+      }
+
+      .tabbar button span {
+        font-size: 20px
+      }
+
+      .tabbar button.on {
+        color: var(--acc)
+      }
+    }
+
+    .card {
+      background: var(--sf);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px;
+      margin-bottom: 16px
+    }
+
+    .card h3 {
+      font-size: 15px;
+      margin-bottom: 10px
+    }
+
+    .g2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px
+    }
+
+    .g2>div>.card:last-child {
+      margin-bottom: 0
+    }
+
+    @media(max-width:860px) {
+      .g2 {
+        grid-template-columns: 1fr
+      }
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: linear-gradient(135deg, var(--sf2), var(--sf))
+    }
+
+    .hero h2 {
+      font-size: 26px;
+      margin: 2px 0 10px
+    }
+
+    .xpbar {
+      height: 10px;
+      background: var(--line);
+      border-radius: 6px;
+      overflow: hidden;
+      width: 260px;
+      max-width: 100%
+    }
+
+    .xpbar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, var(--acc), var(--hot));
+      width: 0
+    }
+
+    .spinbox {
+      text-align: center
+    }
+
+    .orb {
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: grid;
+      place-items: center;
+      font-family: Unbounded, sans-serif;
+      font-weight: 700;
+      font-size: 26px;
+      color: var(--onacc);
+      background: conic-gradient(var(--acc), var(--hot), var(--gold), var(--acc))
+    }
+
+    .orb span {
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: var(--sf);
+      color: var(--ink);
+      display: grid;
+      place-items: center
+    }
+
+    /* arena */
+    .score {
+      background: linear-gradient(135deg, var(--sf2), var(--sf));
+      border-left: 5px solid var(--acc)
+    }
+
+    .live {
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--hot)
+    }
+
+    .live i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--hot);
+      animation: pl 1.2s infinite
+    }
+
+    @keyframes pl {
+      50% {
+        opacity: .2
+      }
+    }
+
+    .big {
+      font-family: Unbounded, sans-serif;
+      font-weight: 700;
+      font-size: clamp(40px, 8vw, 68px);
+      line-height: 1.05;
+      margin: 6px 0
+    }
+
+    .big small {
+      font-size: .3em;
+      color: var(--mute);
+      margin-left: 10px;
+      font-weight: 500
+    }
+
+    .stats {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      color: var(--mute);
+      font-size: 14px
+    }
+
+    .stats b {
+      display: block;
+      color: var(--ink);
+      font-size: 19px;
+      font-family: Unbounded, sans-serif
+    }
+
+    .strip {
+      display: flex;
+      gap: 8px;
+      min-height: 38px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-top: 10px
+    }
+
+    .ball {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      background: var(--sf2);
+      border: 2px solid var(--line);
+      animation: pop .25s
+    }
+
+    @keyframes pop {
+      from {
+        transform: scale(.4)
+      }
+    }
+
+    .ball.b4 {
+      background: var(--acc);
+      color: var(--onacc);
+      border-color: var(--acc)
+    }
+
+    .ball.b6 {
+      background: var(--gold);
+      color: #222;
+      border-color: var(--gold)
+    }
+
+    .ball.bw {
+      background: var(--bad);
+      color: #fff;
+      border-color: var(--bad)
+    }
+
+    .ctrl {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px
+    }
+
+    .sm {
+      background: transparent;
+      color: var(--ink);
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 14px;
+      font-weight: 600
+    }
+
+    #lvw {
+      position: relative
+    }
+
+    .fl {
+      position: absolute;
+      bottom: 20px;
+      font-size: 28px;
+      pointer-events: none
+    }
+
+    .re {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px
+    }
+
+    .chip {
+      background: var(--sf2);
+      border: 1.5px solid var(--line);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-weight: 700
+    }
+
+    .chip[aria-pressed="true"] {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink)
+    }
+
+    .stake {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 6px
+    }
+
+    .mk {
+      border-top: 1px solid var(--line);
+      padding: 12px 0
+    }
+
+    .mkh {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 700;
+      margin-bottom: 8px
+    }
+
+    .mkh span {
+      font-weight: 400;
+      color: var(--mute);
+      font-size: 14px
+    }
+
+    .opts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(104px, 1fr));
+      gap: 8px
+    }
+
+    .opt {
+      background: var(--sf2);
+      border: 1.5px solid var(--line);
+      color: var(--ink);
+      border-radius: 12px;
+      padding: 9px 6px;
+      text-align: center;
+      font-weight: 600
+    }
+
+    .opt:hover:not(:disabled) {
+      border-color: var(--acc)
+    }
+
+    .opt:active:not(:disabled) {
+      transform: scale(.97)
+    }
+
+    .opt:disabled {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    .opt i {
+      display: block;
+      font-style: normal;
+      color: var(--acc);
+      font-family: Unbounded, sans-serif;
+      font-size: 14px;
+      margin-top: 2px
+    }
+
+    .forb,
+    .agb {
+      border: 0;
+      border-radius: 12px;
+      padding: 9px 6px;
+      min-width: 84px;
+      font-weight: 700;
+      font-family: Unbounded, sans-serif;
+      font-size: 14px
+    }
+
+    .forb {
+      background: var(--good);
+      color: #04210f
+    }
+
+    .agb {
+      background: var(--hot);
+      color: #2a0a02
+    }
+
+    .forb:disabled,
+    .agb:disabled {
+      opacity: .4;
+      cursor: not-allowed
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px
+    }
+
+    td {
+      padding: 7px 4px;
+      border-top: 1px solid var(--line)
+    }
+
+    td:last-child {
+      text-align: right;
+      white-space: nowrap
+    }
+
+    .w {
+      color: var(--good);
+      font-weight: 700
+    }
+
+    .l {
+      color: var(--bad)
+    }
+
+    .p {
+      color: var(--mute)
+    }
+
+    #mo td:not(:first-child) {
+      text-align: center
+    }
+
+    .lb tr.me {
+      font-weight: 700;
+      background: var(--sf2)
+    }
+
+    .log {
+      font-size: 14px;
+      color: var(--mute);
+      margin: 0;
+      padding-left: 20px
+    }
+
+    .note {
+      font-size: 13px;
+      color: var(--mute)
+    }
+
+    .fl2 {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 6px 0 10px
+    }
+
+    .ul {
+      max-height: 340px;
+      overflow-y: auto;
+      border-top: 1px solid var(--line)
+    }
+
+    .um {
+      display: grid;
+      grid-template-columns: 92px 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 2px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .um .dt {
+      font-weight: 700;
+      line-height: 1.2
+    }
+
+    .um .dt span,
+    .um .nm span {
+      display: block;
+      font-weight: 400;
+      font-size: 13px;
+      color: var(--mute)
+    }
+
+    .um .nm {
+      font-weight: 600
+    }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 2px 10px;
+      background: var(--sf2);
+      border: 1px solid var(--line)
+    }
+
+    @media(max-width:560px) {
+      .um {
+        grid-template-columns: 76px 1fr
+      }
+
+      .um .tag {
+        display: none
+      }
+    }
+
+    /* games */
+    .gcards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px
+    }
+
+    .gc {
+      border: 0;
+      border-radius: 18px;
+      padding: 18px 14px;
+      text-align: left;
+      color: #fff;
+      min-height: 112px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between
+    }
+
+    .gc b {
+      font-family: Unbounded, sans-serif;
+      font-size: 16px
+    }
+
+    .gc span {
+      font-size: 13px;
+      opacity: .9
+    }
+
+    .gc em {
+      font-style: normal;
+      font-size: 30px
+    }
+
+    .rw {
+      font-family: Unbounded, sans-serif;
+      font-weight: 700;
+      font-size: 70px;
+      width: 170px;
+      height: 170px;
+      border-radius: 50%;
+      margin: 6px auto 12px;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      border: 6px solid #ffffff55
+    }
+
+    .rw.r {
+      background: #c0392b
+    }
+
+    .rw.k {
+      background: #1c1f1d
+    }
+
+    .rw.g {
+      background: #1f8a4c
+    }
+
+    .rcr,
+    .rck,
+    .rcg {
+      display: inline-grid;
+      place-items: center;
+      min-width: 36px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 16px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 13px;
+      margin: 2px
+    }
+
+    .rcr {
+      background: #c0392b
+    }
+
+    .rck {
+      background: #1c1f1d
+    }
+
+    .rcg {
+      background: #1f8a4c
+    }
+
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 28px;
+      text-align: center;
+      margin-bottom: 12px
+    }
+
+    .pc {
+      display: grid;
+      place-items: center;
+      width: 108px;
+      height: 148px;
+      border-radius: 14px;
+      background: #fff;
+      color: #0a1a24;
+      font-family: Unbounded, sans-serif;
+      font-weight: 700;
+      font-size: 40px;
+      border: 2px solid var(--line);
+      box-shadow: 0 8px 18px #0003
+    }
+
+    .sky {
+      position: relative;
+      height: 250px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #07202e, #0f5c73);
+      overflow: hidden;
+      margin-bottom: 12px
+    }
+
+    .plane {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      font-size: 36px;
+      transition: left .06s linear, bottom .06s linear
+    }
+
+    .avm {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-family: Unbounded, sans-serif;
+      font-weight: 700;
+      font-size: 52px;
+      color: #fff;
+      pointer-events: none
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center
+    }
+
+    /* missions, profile */
+    .ms {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 14px;
+      align-items: center;
+      padding: 12px 0;
+      border-top: 1px solid var(--line)
+    }
+
+    .ms:first-of-type {
+      border-top: 0
+    }
+
+    .bar {
+      grid-column: 1/-1;
+      height: 8px;
+      border-radius: 5px;
+      background: var(--line);
+      overflow: hidden
+    }
+
+    .bar i {
+      display: block;
+      height: 100%;
+      background: var(--acc)
+    }
+
+    .av {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-family: Unbounded, sans-serif;
+      font-size: 30px;
+      color: #06212b
+    }
+
+    .sw {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 3px solid transparent
+    }
+
+    .sw.on {
+      border-color: var(--ink)
+    }
+
+    .bdg {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+      gap: 10px
+    }
+
+    .bd {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 6px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--sf2)
+    }
+
+    .bd em {
+      display: block;
+      font-style: normal;
+      font-size: 28px
+    }
+
+    .bd.off {
+      opacity: .35;
+      filter: grayscale(1)
+    }
+
+    .sts {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 14px;
+      color: var(--mute)
+    }
+
+    .sts b {
+      display: block;
+      color: var(--ink);
+      font-size: 20px;
+      font-family: Unbounded, sans-serif
+    }
+
+    .rules li {
+      margin-bottom: 8px
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-50%) translateY(20px);
+      background: var(--ink);
+      color: var(--bg);
+      padding: 9px 20px;
+      border-radius: 999px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transition: all .25s;
+      z-index: 9;
+      max-width: 92vw;
+      text-align: center
+    }
+
+    .toast.on {
+      opacity: 1;
+      transform: translateX(-50%)
+    }
+
+    .toast.win {
+      background: var(--gold);
+      color: #2a1d00
+    }
+
+    @media(min-width:861px) {
+      .toast {
+        bottom: 24px
+      }
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        animation: none !important;
+        transition: none !important
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="auth" id="auth">
+    <section class="brand">
+      <div class="tags"><span>Demo coins only</span></div>
+      <div>
+        <h1>Read the game. Call the ball.</h1>
+        <p>Googly turns every delivery into a prediction. Level up, finish daily missions, collect badges and take on
+          three quick games, all with demo coins.</p>
+      </div>
+      <div class="tags"><span>Live ball-by-ball</span><span>XP and levels</span><span>Daily missions</span><span>No real
+          money</span></div>
+      <div class="arc"></div>
+    </section>
+    <section class="formside">
+      <div class="fcard">
+        <div class="tabs" role="tablist"><button role="tab" id="tLogin" aria-selected="true">Log in</button><button
+            role="tab" id="tSign" aria-selected="false">Sign up</button></div>
+        <form id="form" onsubmit="return false">
+          <label for="u">Username</label><input id="u" autocomplete="username" maxlength="16">
+          <label for="p">Password</label><input id="p" type="password" autocomplete="current-password">
+          <div id="c2" class="hide"><label for="p2">Confirm password</label><input id="p2" type="password"
+              autocomplete="new-password"></div>
+          <div class="err" id="err" role="alert"></div>
+          <button class="btn wide" id="submit" type="submit">Log in</button>
+          <button class="btn ghost wide" id="demo" type="button">Try the demo account</button>
+        </form>
+        <p class="fine">New accounts start with 1,000 demo coins. Coins have no cash value and can’t be bought or
+          withdrawn. Accounts live in this browser only, so don’t reuse a real password.</p>
+      </div>
+    </section>
+  </main>
+
+  <div class="shell hide" id="app">
+    <aside class="side">
+      <div class="logo">Goog<b>ly</b></div>
+      <div id="nav"></div>
+      <div class="sp"></div>
+      <p class="mut" style="padding:0 12px">Demo coins only. 18+.</p>
+    </aside>
+    <section class="main">
+      <header class="top">
+        <h1 id="ptitle">Home</h1>
+        <div class="right"><span class="pill">Lv<b id="lv">1</b></span><span class="pill">Coins<b
+              id="pts">0</b></span><span class="pill">At stake<b id="exp">0</b></span><button class="ico" id="theme"
+            aria-label="Switch theme">◐</button></div>
+      </header>
+
+      <div id="p-home" class="page">
+        <div class="card hero">
+          <div>
+            <p class="mut" id="hg"></p>
+            <h2 id="hn"></h2>
+            <div class="xpbar"><i id="xpf"></i></div>
+            <p class="mut" id="xpt" style="margin-top:6px"></p>
+          </div>
+          <div class="spinbox">
+            <div class="orb"><span id="orb">?</span></div><button class="btn" id="spinb">Daily lucky spin</button>
+            <p class="mut" id="spint"></p>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <h3>Live now</h3>
+            <div id="hlive"></div><button class="btn wide" data-go="arena">Open the arena</button>
+          </div>
+          <div class="card">
+            <h3>Today’s missions</h3>
+            <div id="hmis"></div><button class="btn ghost wide" data-go="missions">All missions</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Quick games</h3>
+          <div class="gcards" id="hgames"></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <h3>Leaderboard</h3>
+            <table class="lb" id="lb"></table>
+          </div>
+          <div class="card">
+            <h3>Coming up</h3>
+            <div id="hup"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="p-arena" class="page hide">
+        <section class="card score">
+          <span class="live"><i></i>LIVE · T20 demo</span>
+          <p class="mut">Mumbai Meteors batting vs Delhi Dynamos · 20 overs</p>
+          <div class="big"><span id="runs">0</span>/<span id="wk">0</span><small id="ov">0.0 overs</small></div>
+          <div class="stats">
+            <div>Run rate<b id="crr">0.00</b></div>
+            <div>Projected<b id="proj">–</b></div>
+            <div>This over<b id="tov">0</b></div>
+          </div>
+          <div class="strip" id="strip" aria-live="polite"></div>
+          <p class="mut" id="phase" style="margin-top:6px"></p>
+          <div class="ctrl"><button class="sm" id="pause">Pause</button><button class="sm" id="speed">Speed
+              1×</button><button class="sm" id="newm">New match</button></div>
+        </section>
+        <div class="g2">
+          <div>
+            <div class="card">
+              <h3>Predict</h3>
+              <div class="stake stk"></div>
+              <div id="markets"></div>
+              <p class="note">Tap an option to stake the selected coins. Winnings = stake × odds.</p>
+            </div>
+            <div class="card">
+              <div class="mkh"><b>Win market</b><span>Meteors win if they post 160 or more</span></div>
+              <table id="mo"></table>
+              <p class="note">“For” means you predict a team wins. “Against” means you predict it doesn’t, and your
+                liability counts as coins at stake.</p>
+            </div>
+          </div>
+          <div>
+            <div class="card">
+              <h3>My slip</h3>
+              <table id="bets"></table>
+              <p class="note" id="nobets">No predictions yet. Pick an option to start.</p>
+            </div>
+            <div class="card">
+              <h3>Commentary</h3>
+              <ol class="log" id="log" reversed></ol>
+            </div>
+            <div class="card">
+              <h3>Upcoming matches</h3>
+              <div class="fl2" id="ufl"></div>
+              <div class="ul" id="ul"></div>
+              <p class="note">Fixtures from public schedules, checked 18 Nov 2026. Times in your local time. Schedules
+                can change.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="p-games" class="page hide">
+        <div class="card">
+          <h3>Choose a game</h3>
+          <div class="gcards" id="gpage"></div>
+        </div>
+      </div>
+
+      <div id="p-wheel" class="page hide">
+        <div class="card">
+          <div class="rw g" id="rwn">–</div>
+          <div style="text-align:center" id="rhist"></div>
+          <div class="stake stk" style="margin-top:10px"></div>
+          <div class="opts"><button class="opt" data-rb="red">Red<i>2×</i></button><button class="opt"
+              data-rb="black">Black<i>2×</i></button><button class="opt" data-rb="even">Even<i>2×</i></button><button
+              class="opt" data-rb="odd">Odd<i>2×</i></button><button class="opt" data-rb="low">1 to
+              18<i>2×</i></button><button class="opt" data-rb="high">19 to 36<i>2×</i></button></div>
+          <div class="row" style="margin-top:12px"><input id="rnum" type="number" min="0" max="36"
+              placeholder="Number 0 to 36" style="max-width:170px"><button class="chip" id="rgo">Bet on number ·
+              36×</button></div>
+          <p class="note">Single-zero wheel. Zero loses every outside bet.</p>
+        </div>
+      </div>
+
+      <div id="p-duel" class="page hide">
+        <div class="card">
+          <div class="cards">
+            <div>
+              <div class="pc" id="dc1">?</div>
+              <p>Team Red</p>
+            </div>
+            <div>
+              <div class="pc" id="dc2">?</div>
+              <p>Team Blue</p>
+            </div>
+          </div>
+          <div class="stake stk"></div>
+          <div class="opts"><button class="opt" data-dt="d">Team Red<i>2×</i></button><button class="opt"
+              data-dt="tie">Tie<i>9×</i></button><button class="opt" data-dt="t">Team Blue<i>2×</i></button></div>
+          <p class="note">The higher card wins and Ace is low. A tie loses Red and Blue bets.</p>
+        </div>
+      </div>
+
+      <div id="p-jet" class="page hide">
+        <div class="card">
+          <div class="sky">
+            <div class="avm" id="avm">1.00×</div>
+            <div class="plane" id="plane">✈️</div>
+          </div>
+          <div class="stake stk"></div><button class="btn wide" id="avb">Take off</button>
+          <p class="note" id="avs">Place a bet to start the next flight.</p>
+          <div id="ahist"></div>
+        </div>
+      </div>
+
+      <div id="p-missions" class="page hide">
+        <div class="card">
+          <h3>Today’s missions</h3>
+          <div id="mlist"></div>
+          <p class="note">Missions reset every day. Each one you claim also gives 30 XP.</p>
+        </div>
+        <div class="card">
+          <h3>How you level up</h3>
+          <p class="mut">Predictions earn 5 XP, wins earn 15 XP, game rounds earn 2 XP and spins earn 10 XP. Every
+            level-up gives 100 coins and every 5-win streak gives 100 coins.</p>
+        </div>
+      </div>
+
+      <div id="p-me" class="page hide">
+        <div class="card">
+          <div class="row" style="gap:16px">
+            <div class="av" id="mav"></div>
+            <div>
+              <h2 id="mn" style="font-size:22px"></h2>
+              <p class="mut" id="ml"></p>
+            </div>
+          </div>
+          <div class="row" style="margin-top:14px" id="msw"></div>
+        </div>
+        <div class="card">
+          <h3>Your record</h3>
+          <div class="sts" id="sts"></div>
+        </div>
+        <div class="card">
+          <h3>Badges</h3>
+          <div class="bdg" id="bdg"></div>
+        </div>
+        <div class="g2">
+          <div class="card">
+            <h3>Change password</h3>
+            <label for="pw0">Current password</label><input id="pw0" type="password" autocomplete="current-password">
+            <label for="pw1">New password</label><input id="pw1" type="password" autocomplete="new-password">
+            <label for="pw2">Confirm new password</label><input id="pw2" type="password" autocomplete="new-password">
+            <div class="err" id="pwerr" role="alert"></div><button class="btn wide" id="pwgo">Save password</button>
+          </div>
+          <div class="card">
+            <h3>Account</h3>
+            <button class="btn ghost wide" id="refill">Refill 200 coins (when under 50)</button>
+            <button class="btn ghost wide" data-go="activity">View activity</button>
+            <button class="btn ghost wide" data-go="rules">Rules</button>
+            <button class="btn ghost wide" id="reset">Reset all progress</button>
+            <button class="btn wide" id="logout">Log out</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="p-activity" class="page hide">
+        <div class="card">
+          <h3>By game</h3>
+          <table id="lgtab"></table>
+          <p class="note">Based on your last 150 transactions.</p>
+        </div>
+        <div class="card">
+          <h3>Transactions</h3>
+          <table id="sttab"></table>
+          <p class="note" id="stno">No transactions yet. Play to see activity here.</p>
+        </div>
+      </div>
+
+      <div id="p-rules" class="page hide">
+        <div class="card">
+          <ol class="rules">
+            <li>Every game uses demo coins. Coins have no cash value and can’t be bought, sold, deposited or withdrawn.
+            </li>
+            <li>“At stake” is the number of coins currently locked in open predictions and flights.</li>
+            <li>Live Arena: a winning prediction pays stake × odds. Markets lock when they close.</li>
+            <li>Win market: “For” pays stake × price if the team wins. “Against” risks your liability to win the other
+              side’s stake.</li>
+            <li>Lucky Wheel: colour, odd/even and range bets pay 2×, a single number pays 36×. Zero loses outside bets.
+            </li>
+            <li>Card Duel: the higher card wins. Red and Blue pay 2×, Tie pays 9×.</li>
+            <li>Sky Jet: cash out before the jet flies away. If it flies away first, you lose the stake.</li>
+            <li>Daily lucky spin is available once every 24 hours.</li>
+            <li>For ages 18 and above. Take a break whenever you like.</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+    <nav class="tabbar" id="tabs"></nav>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    (function () {
+      var $ = function (s) { return document.querySelector(s) };
+      var UK = 'googly_users_v1', SK = 'googly_session_v1';
+      var BOTS = [['Aarav', 1340], ['Meera', 1210], ['Kabir', 1090], ['Isha', 960], ['Dev', 820]];
+      var users = {}, cur = null, S = null, mode = 'login';
+      try { users = JSON.parse(localStorage.getItem(UK) || '{}') } catch (e) { }
+      function persist() { try { if (cur && S) users[cur].d = S; localStorage.setItem(UK, JSON.stringify(users)) } catch (e) { } }
+      function today() { return new Date().toISOString().slice(0, 10) }
+      function newState() { return { pts: 1000, bets: [], id: 1, stake: 50, spin: 0, refill: 0, w: 0, l: 0, streak: 0, best: 0, led: [], xp: 0, av: 0, bd: { got: {} }, mi: { d: '', pl: 0, win: 0, g: {}, six: 0, cl: {} }, bots: BOTS.map(function (b) { return b.slice() }) } }
+
+      /* ---------- auth ---------- */
+      function hash(pw, salt) {
+        var s = salt + ':' + pw;
+        if (window.crypto && crypto.subtle) { return crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)).then(function (b) { return Array.from(new Uint8Array(b)).map(function (x) { return x.toString(16).padStart(2, '0') }).join('') }) }
+        var h = 5381; for (var i = 0; i < s.length; i++)h = ((h << 5) + h + s.charCodeAt(i)) | 0; return Promise.resolve(String(h));
+      }
+      function setMode(m) { mode = m; $('#tLogin').setAttribute('aria-selected', m === 'login'); $('#tSign').setAttribute('aria-selected', m === 'sign'); $('#c2').classList.toggle('hide', m === 'login'); $('#submit').textContent = m === 'login' ? 'Log in' : 'Create account'; $('#err').textContent = '' }
+      $('#tLogin').onclick = function () { setMode('login') }; $('#tSign').onclick = function () { setMode('sign') };
+      function fail(t) { $('#err').textContent = t }
+      $('#submit').onclick = function () {
+        var n = $('#u').value.trim(), k = n.toLowerCase(), p = $('#p').value;
+        if (!/^[A-Za-z0-9_]{3,16}$/.test(n)) return fail('Username: 3 to 16 letters, numbers or underscores.');
+        if (p.length < 4) return fail('Password needs at least 4 characters.');
+        if (mode === 'sign') {
+          if (p !== $('#p2').value) return fail('Passwords don’t match.');
+          if (users[k]) return fail('That username is taken. Try another or log in.');
+          var salt = Math.random().toString(36).slice(2);
+          hash(p, salt).then(function (h) { users[k] = { name: n, salt: salt, h: h, d: newState() }; cur = k; persist(); enter() });
+        } else {
+          var u = users[k]; if (!u) return fail('No account with that username. Sign up first.');
+          hash(p, u.salt).then(function (h) { if (h !== u.h) return fail('Wrong password.'); cur = k; enter() });
+        }
+      };
+      $('#demo').onclick = function () {
+        var k = 'demo', go = function () { cur = k; enter() };
+        if (users[k]) return go();
+        hash('demo', 'demo-salt').then(function (h) { users[k] = { name: 'demo', salt: 'demo-salt', h: h, d: newState() }; persist(); go() });
+      };
+      function enter() {
+        S = Object.assign(newState(), users[cur].d); users[cur].d = S; mis();
+        try { localStorage.setItem(SK, cur) } catch (e) { }
+        $('#err').textContent = ''; $('#p').value = ''; $('#p2').value = '';
+        $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
+        newMatch(); paused = false; $('#pause').textContent = 'Pause'; route(); schedule();
+      }
+      function logout() { clearTimeout(timer); persist(); cur = null; S = null; try { localStorage.removeItem(SK) } catch (e) { } $('#app').classList.add('hide'); $('#auth').classList.remove('hide') }
+
+      /* ---------- progress: xp, missions, badges ---------- */
+      function lvl(x) { return Math.floor(Math.sqrt(x / 40)) + 1 }
+      function mis() { if (S.mi.d !== today()) S.mi = { d: today(), pl: 0, win: 0, g: {}, six: 0, cl: {} }; return S.mi }
+      function addXp(n) { var o = lvl(S.xp); S.xp += n; var L = lvl(S.xp); if (L > o) { S.pts += 100; led('bonus', 100, 'Level ' + L + ' reward'); toast('Level up! You are level ' + L + '. +100 coins', true) } }
+      var MS = [['Place 5 predictions', 5, 100, function (m) { return m.pl }], ['Win 3 predictions', 3, 150, function (m) { return m.win }], ['Play all 3 games', 3, 120, function (m) { return Object.keys(m.g).length }], ['Call a six correctly', 1, 200, function (m) { return m.six }]];
+      var BD = [['First win', '🏆', function () { return S.w >= 1 }], ['5-win streak', '🔥', function () { return S.best >= 5 }], ['Sixer caller', '💥', function () { return S.bd.six }], ['High roller', '💎', function () { return S.bd.roll }], ['Sky high 5×', '🚀', function () { return S.bd.jet }], ['Level 5', '⭐', function () { return lvl(S.xp) >= 5 }]];
+      function checkBadges() { BD.forEach(function (b) { if (!S.bd.got[b[0]] && b[2]()) { S.bd.got[b[0]] = 1; toast('Badge unlocked: ' + b[0], true) } }) }
+      function won() { S.w++; S.streak++; S.best = Math.max(S.best, S.streak); mis().win++; addXp(15); if (S.streak % 5 === 0) { S.pts += 100; led('bonus', 100, 'Streak bonus: ' + S.streak + ' wins'); toast('Streak bonus +100 coins', true) } }
+      function lost() { S.l++; S.streak = 0 }
+      function led(g, a, d) { S.led.unshift({ t: Date.now(), g: g, a: a, d: d, b: S.pts }); if (S.led.length > 150) S.led.pop() }
+      function charge(g, d) { if (S.stake > S.pts) { toast('Not enough coins. Try the daily lucky spin.'); return false } S.pts -= S.stake; led(g, -S.stake, d); if (g !== 'arena') mis().g[g] = 1; addXp(2); if (S.stake >= 500) S.bd.roll = 1; return true }
+      function credit(g, a, d) { S.pts += a; led(g, a, d) }
+
+      /* ---------- match engine ---------- */
+      var M, timer, paused = false, speed = 1;
+      function newMatch() { M = { balls: 0, runs: 0, w: 0, bio: 0, ovRuns: 0, over: [], log: [], ended: false, lastOver: null } }
+      var MK = {
+        ball: { t: 'Next ball', hint: 'settles after one ball', o: [['Dot', 2.6], ['1 or 2', 2.3], ['Four', 7], ['Six', 14], ['Wicket', 14]], open: function () { return !M.ended } },
+        over: { t: 'Runs this over', hint: 'open between overs', o: [['5 or fewer', 2.2], ['6 to 9', 2.4], ['10 or more', 3.2]], open: function () { return M.bio === 0 && !M.ended } },
+        total: { t: 'Innings total', hint: 'open until over 6', o: [['Under 150', 3], ['150 to 179', 2.1], ['180 or more', 4]], open: function () { return M.balls < 36 && !M.ended } }
+      };
+      function roll() { var r = Math.random(); if (r < .36) return { r: 0, w: 0 }; if (r < .66) return { r: 1, w: 0 }; if (r < .76) return { r: 2, w: 0 }; if (r < .88) return { r: 4, w: 0 }; if (r < .94) return { r: 6, w: 0 }; return { r: 0, w: 1 } }
+      function settle(mk, idx) {
+        var gain = 0;
+        S.bets.forEach(function (b) {
+          if (b.st !== 'open' || b.mk !== mk) return;
+          if (b.idx === idx) { b.st = 'won'; b.pay = Math.round(b.stake * b.odds); S.pts += b.pay; led('arena', b.pay, 'Win: ' + b.label); won(); gain += b.pay - b.stake; if (mk === 'ball' && idx === 3) { mis().six++; S.bd.six = 1 } }
+          else { b.st = 'lost'; b.pay = 0; lost() }
+        });
+        if (gain) toast('You won +' + gain + ' coins', true);
+      }
+      function bowl() {
+        var x = roll(), o = Math.floor(M.balls / 6), b = M.balls % 6 + 1;
+        M.balls++; M.runs += x.r; M.w += x.w; M.bio++; M.ovRuns += x.r; M.over.push(x.w ? 'W' : String(x.r));
+        var bi = x.w ? 4 : x.r === 0 ? 0 : x.r <= 2 ? 1 : x.r === 4 ? 2 : 3;
+        M.log.unshift(o + '.' + b + ' ' + (x.w ? 'Wicket! Batter is out.' : x.r === 0 ? 'Dot ball.' : x.r === 4 ? 'Four runs.' : x.r === 6 ? 'Six! Over the rope.' : x.r + ' run' + (x.r > 1 ? 's' : '') + '.'));
+        if (M.log.length > 6) M.log.pop();
+        settle('ball', bi);
+        if (M.bio === 6) {
+          settle('over', M.ovRuns <= 5 ? 0 : M.ovRuns <= 9 ? 1 : 2);
+          M.lastOver = M.ovRuns; M.bio = 0; M.ovRuns = 0; M.over = [];
+          S.bots = S.bots.map(function (p) { return [p[0], Math.max(100, p[1] + Math.round((Math.random() - .45) * 90))] });
+        }
+        if (M.balls >= 120 || M.w >= 10) { M.ended = true; settle('total', M.runs < 150 ? 0 : M.runs < 180 ? 1 : 2); settleMO(M.runs >= 160 ? 0 : 1); M.log.unshift('Innings over: ' + M.runs + '/' + M.w + '.') }
+        checkBadges(); persist(); renderCur();
+      }
+      function schedule() {
+        clearTimeout(timer); if (!cur || M.ended || paused) return;
+        var d = M.balls === 0 ? 5000 : (M.bio === 0 ? 6500 : 2400);
+        timer = setTimeout(function () { bowl(); schedule() }, d / speed);
+      }
+      function place(mk, idx) {
+        var m = MK[mk];
+        if (!m.open()) { toast('This market is closed'); return }
+        if (!charge('arena', m.t + ': ' + m.o[idx][0])) return;
+        mis().pl++; addXp(5);
+        S.bets.unshift({ id: S.id++, mk: mk, idx: idx, odds: m.o[idx][1], stake: S.stake, st: 'open', pay: 0, label: m.t + ': ' + m.o[idx][0] });
+        if (S.bets.length > 40) S.bets.pop();
+        persist(); renderCur(); toast('Staked ' + S.stake + ' on ' + m.o[idx][0]);
+      }
+
+      /* win market */
+      var MN = ['Mumbai Meteors', 'Delhi Dynamos'];
+      function moOdds() {
+        var pj = M.balls >= 12 ? M.runs / M.balls * 120 : 160, p = 1 / (1 + Math.exp(-((pj - M.w * 4) - 160) / 20));
+        p = Math.min(.93, Math.max(.07, p)); var a = 1 / p, b = 1 / (1 - p);
+        return [[+(a * .99).toFixed(2), +(a * 1.01).toFixed(2)], [+(b * .99).toFixed(2), +(b * 1.01).toFixed(2)]];
+      }
+      function renderMO() {
+        var o = moOdds(), h = '', d = M.ended ? ' disabled' : '';
+        for (var i = 0; i < 2; i++)h += '<tr><td><b>' + MN[i] + '</b></td><td><button class=forb data-mo=f' + i + d + '>' + o[i][0].toFixed(2) + '</button></td><td><button class=agb data-mo=a' + i + d + '>' + o[i][1].toFixed(2) + '</button></td></tr>';
+        $('#mo').innerHTML = '<tr><td class=p>Team</td><td class=p>For</td><td class=p>Against</td></tr>' + h;
+      }
+      function moBet(side, i) {
+        if (M.ended) { toast('This market is closed'); return }
+        var pr = moOdds()[i][side === 'f' ? 0 : 1], s = S.stake, amt = side === 'f' ? s : Math.max(1, Math.round(s * (pr - 1)));
+        if (amt > S.pts) { toast('Not enough coins. Try the daily lucky spin.'); return }
+        S.pts -= amt; var lab = 'Win market: ' + MN[i] + (side === 'f' ? ' (For)' : ' (Against)');
+        led('arena', -amt, lab + ' @ ' + pr); mis().pl++; addXp(5); if (s >= 500) S.bd.roll = 1;
+        S.bets.unshift({ id: S.id++, mk: 'mo', team: i, side: side, odds: pr, stake: amt, back: s, st: 'open', pay: 0, label: lab });
+        if (S.bets.length > 40) S.bets.pop();
+        persist(); renderCur(); toast((side === 'f' ? 'For ' : 'Against ') + MN[i] + ' @ ' + pr + (side === 'a' ? '. Liability ' + amt : ''));
+      }
+      function settleMO(w) {
+        var tot = 0;
+        S.bets.forEach(function (b) {
+          if (b.st !== 'open' || b.mk !== 'mo') return;
+          var win = b.side === 'f' ? b.team === w : b.team !== w;
+          if (win) { b.pay = b.side === 'f' ? Math.round(b.stake * b.odds) : b.stake + b.back; b.st = 'won'; S.pts += b.pay; led('arena', b.pay, 'Win: ' + b.label); won(); tot += b.pay - b.stake }
+          else { b.st = 'lost'; b.pay = 0; lost() }
+        });
+        if (tot > 0) toast('Win market settled. You won +' + tot, true);
+      }
+
+
+      /* ---------- games ---------- */
+      var RED = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36], rb = false, rh = [];
+      var RB = { red: ['Red', 2, function (n) { return RED.indexOf(n) >= 0 }], black: ['Black', 2, function (n) { return n > 0 && RED.indexOf(n) < 0 }], even: ['Even', 2, function (n) { return n > 0 && n % 2 === 0 }], odd: ['Odd', 2, function (n) { return n % 2 === 1 }], low: ['1 to 18', 2, function (n) { return n >= 1 && n <= 18 }], high: ['19 to 36', 2, function (n) { return n >= 19 }] };
+      function rcls(n) { return n === 0 ? 'g' : RED.indexOf(n) >= 0 ? 'r' : 'k' }
+      function rshow(n) { var e = $('#rwn'); e.textContent = n; e.className = 'rw ' + rcls(n); var h = ''; rh.forEach(function (x) { h += '<span class=rc' + rcls(x) + '>' + x + '</span>' }); $('#rhist').innerHTML = h }
+      function spin(name, mult, test) {
+        if (rb) return; if (!charge('wheel', 'Wheel: ' + name)) return;
+        rb = true; var stake = S.stake, i = 0, n = 0; renderCur();
+        var iv = setInterval(function () {
+          n = Math.floor(Math.random() * 37); rshow(n);
+          if (++i > 14) {
+            clearInterval(iv); rb = false;
+            if (test(n)) { var p = stake * mult; credit('wheel', p, 'Win: ' + name + ' (ball ' + n + ')'); toast('Ball landed on ' + n + '. You won +' + (p - stake), true) } else toast('Ball landed on ' + n + '. No win.');
+            rh.unshift(n); rh = rh.slice(0, 12); rshow(n); persist(); renderCur()
+          }
+        }, 90);
+      }
+      var CL = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'], db = false;
+      function deal(side) {
+        if (db) return; var mult = { d: 2, t: 2, tie: 9 }, nm = { d: 'Team Red', t: 'Team Blue', tie: 'Tie' };
+        if (!charge('duel', 'Duel: ' + nm[side])) return;
+        db = true; var stake = S.stake, a = 1 + Math.floor(Math.random() * 13), b = 1 + Math.floor(Math.random() * 13);
+        $('#dc1').textContent = '?'; $('#dc2').textContent = '?'; renderCur();
+        setTimeout(function () {
+          $('#dc1').textContent = CL[a]; $('#dc2').textContent = CL[b];
+          var w = a > b ? 'd' : a < b ? 't' : 'tie'; db = false;
+          if (w === side) { var p = stake * mult[side]; credit('duel', p, 'Win: ' + nm[side] + ' (' + CL[a] + ' v ' + CL[b] + ')'); toast(nm[w] + ' wins. You won +' + (p - stake), true) } else toast(nm[w] + ' wins. No win.');
+          persist(); renderCur();
+        }, 700);
+      }
+      var av = { on: false, stake: 0, m: 1, crash: 1, t0: 0, iv: null }, ah = [];
+      function avDraw() {
+        $('#avm').textContent = av.m.toFixed(2) + '×';
+        var p = $('#plane'); p.style.left = Math.min(82, (av.m - 1) * 9) + '%'; p.style.bottom = Math.min(70, (av.m - 1) * 7) + '%';
+        $('#avs').textContent = av.on ? 'In the air. Cash out before it flies away.' : 'Place a bet to start the next flight.';
+        var h = ''; ah.forEach(function (x) { h += '<span class=' + (x.w ? 'rcg' : 'rcr') + '>' + x.m.toFixed(2) + '×</span>' }); $('#ahist').innerHTML = h;
+      }
+      function avEnd(win) {
+        clearInterval(av.iv); av.on = false;
+        if (win) { var p = Math.floor(av.stake * av.m); credit('jet', p, 'Cash-out at ' + av.m.toFixed(2) + '×'); if (av.m >= 5) S.bd.jet = 1; toast('Cashed out at ' + av.m.toFixed(2) + '×. You won +' + (p - av.stake), true) }
+        else toast('Flew away at ' + av.m.toFixed(2) + '×');
+        ah.unshift({ m: av.m, w: win }); ah = ah.slice(0, 10);
+        $('#avb').textContent = 'Take off'; checkBadges(); persist(); avDraw(); renderCur();
+      }
+      function avTick() {
+        if (!S) { clearInterval(av.iv); av.on = false; return }
+        av.m = Math.pow(1.02, (Date.now() - av.t0) / 100);
+        if (av.m >= av.crash) { av.m = av.crash; avEnd(false) } else avDraw();
+      }
+      function avClick() {
+        if (av.on) { avEnd(true); return }
+        if (!charge('jet', 'Jet bet')) return;
+        av.on = true; av.stake = S.stake; av.m = 1; av.crash = Math.min(200, Math.max(1, 0.97 / (1 - Math.random()))); av.t0 = Date.now();
+        $('#avb').textContent = 'Cash out'; avDraw(); renderCur(); av.iv = setInterval(avTick, 60);
+      }
+
+      /* ---------- lucky spin, refill ---------- */
+      var SP = [50, 50, 50, 75, 75, 100, 100, 150, 150, 200, 300, 500], spinning = false;
+      function luckySpin() {
+        if (spinning || Date.now() - S.spin < 864e5) return;
+        spinning = true; var i = 0, orb = $('#orb'), iv = setInterval(function () {
+          orb.textContent = SP[Math.floor(Math.random() * SP.length)];
+          if (++i > 16) { clearInterval(iv); var p = SP[Math.floor(Math.random() * SP.length)]; orb.textContent = p; S.spin = Date.now(); credit('bonus', p, 'Lucky spin'); addXp(10); spinning = false; persist(); renderCur(); toast('Lucky spin: +' + p + ' coins', true) }
+        }, 90);
+      }
+
+      /* ---------- upcoming matches (snapshot; swap for a server feed) ---------- */
+      var UP = [
+        ['2026-11-22', 1, 'ILT20 Season 5 opens', 'UAE: Dubai, Abu Dhabi, Sharjah', 'T20'],
+        ['2026-11-27', 1, 'New Zealand v India, 2nd Test', 'Christchurch, 27 Nov to 1 Dec', 'Test'],
+        ['2026-12-01T11:30:00Z', 0, 'South Africa v Bangladesh, 1st ODI', 'Buffalo Park, East London', 'ODI'],
+        ['2026-12-01T13:00:00Z', 0, 'Sharjah Warriorz v Gulf Giants', 'ILT20, 14th match', 'T20'],
+        ['2026-12-02T08:30:00Z', 0, 'Abu Dhabi Knight Riders v Desert Vipers', 'ILT20, 15th match', 'T20'],
+        ['2026-12-02', 1, 'Australia v England, 5th T20I', 'Canberra, night match', 'T20'],
+        ['2026-12-04T11:30:00Z', 0, 'South Africa v Bangladesh, 2nd ODI', 'St George’s Park, Gqeberha', 'ODI'],
+        ['2026-12-04', 1, 'Nepal v Italy', 'World Cup Qualifier Play-off, Kirtipur', 'Qualifier'],
+        ['2026-12-07T11:30:00Z', 0, 'South Africa v Bangladesh, 3rd ODI', 'Newlands, Cape Town', 'ODI'],
+        ['2026-12-10T04:00:00Z', 0, 'South Africa v Bangladesh, 1st T20I', 'Bangladesh tour of South Africa', 'T20'],
+        ['2026-12-12T12:30:00Z', 0, 'South Africa v Bangladesh, 2nd T20I', 'Willowmoore Park, Benoni', 'T20'],
+        ['2026-12-13T08:30:00Z', 0, 'India v Sri Lanka, 1st ODI', 'Arun Jaitley Stadium, Delhi', 'ODI'],
+        ['2026-12-16T08:30:00Z', 0, 'India v Sri Lanka, 2nd ODI', 'Sri Lanka tour of India', 'ODI'],
+        ['2026-12-17', 1, 'South Africa v England, 1st Test', 'England tour: 3 Tests and 3 ODIs', 'Test'],
+        ['2026-12-19T08:30:00Z', 0, 'India v Sri Lanka, 3rd ODI', 'Sri Lanka tour of India', 'ODI'],
+        ['2026-12-22T13:30:00Z', 0, 'India v Sri Lanka, 1st T20I', 'Sri Lanka tour of India', 'T20']
+      ], upf = 'All';
+      function upRow(m) {
+        var d = new Date(m[0] + (m[1] ? 'T00:00:00' : '')), days = Math.round((d - Date.now()) / 864e5);
+        var dd = d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' });
+        var tm = m[1] ? 'Time to be confirmed' : d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+        var when = days <= 0 ? 'Today' : days === 1 ? 'Tomorrow' : 'In ' + days + ' days';
+        return '<div class=um><div class=dt>' + dd + '<span>' + tm + '</span></div><div class=nm>' + m[2] + '<span>' + m[3] + ' · ' + when + '</span></div><span class=tag>' + m[4] + '</span></div>';
+      }
+
+      /* ---------- pages, routing, render ---------- */
+      var PG = ['home', 'arena', 'games', 'wheel', 'duel', 'jet', 'missions', 'me', 'activity', 'rules'];
+      var PT = { home: 'Home', arena: 'Live Arena', games: 'Games', wheel: 'Lucky Wheel', duel: 'Card Duel', jet: 'Sky Jet', missions: 'Missions', me: 'Profile', activity: 'Activity', rules: 'Rules' };
+      var NV = [['home', 'Home', '⌂'], ['arena', 'Live Arena', '🏏'], ['games', 'Games', '🎮'], ['missions', 'Missions', '🎯'], ['me', 'Profile', '👤']];
+      var GM = [['wheel', '🎡', 'Lucky Wheel', 'Pick a colour or number', 'linear-gradient(135deg,#0f766e,#2bc4e6)'], ['duel', '🃏', 'Card Duel', 'Higher card wins', 'linear-gradient(135deg,#b45309,#ffc857)'], ['jet', '✈️', 'Sky Jet', 'Cash out in time', 'linear-gradient(135deg,#9f1239,#ff6b4a)']];
+      var AVC = ['#2bc4e6', '#ff6b4a', '#ffc857', '#3ddc97', '#a78bfa', '#f472b6'];
+      var GN = { arena: 'Live Arena', wheel: 'Lucky Wheel', duel: 'Card Duel', jet: 'Sky Jet', bonus: 'Rewards' };
+      function page() { var v = location.hash.replace('#', ''); return PG.indexOf(v) < 0 ? 'home' : v }
+      function grp(v) { return v === 'wheel' || v === 'duel' || v === 'jet' ? 'games' : v }
+      (function buildNav() {
+        var a = '', b = '';
+        NV.concat([['activity', 'Activity', '🧾'], ['rules', 'Rules', '📜']]).forEach(function (n) { a += '<button data-go=' + n[0] + ' data-nav=' + n[0] + '>' + n[2] + ' ' + n[1] + '</button>' });
+        NV.forEach(function (n) { b += '<button data-go=' + n[0] + ' data-nav=' + n[0] + '><span>' + n[2] + '</span>' + n[1] + '</button>' });
+        $('#nav').innerHTML = a; $('#tabs').innerHTML = b;
+        var g = ''; GM.forEach(function (x) { g += '<button class=gc data-go=' + x[0] + ' style=\'background:' + x[4] + '\'><em>' + x[1] + '</em><div><b>' + x[2] + '</b><br><span>' + x[3] + '</span></div></button>' });
+        $('#hgames').innerHTML = g; $('#gpage').innerHTML = g;
+      })();
+      function route() {
+        if (!S) return;
+        var v = page();
+        PG.forEach(function (x) { $('#p-' + x).classList.toggle('hide', x !== v) });
+        document.querySelectorAll('[data-nav]').forEach(function (b) { b.classList.toggle('on', b.dataset.nav === grp(v)) });
+        $('#ptitle').textContent = PT[v]; window.scrollTo(0, 0); renderCur();
+      }
+      window.addEventListener('hashchange', route);
+      function updateTop() {
+        var ex = 0; S.bets.forEach(function (b) { if (b.st === 'open') ex += b.stake }); if (av.on) ex += av.stake;
+        $('#pts').textContent = S.pts; $('#exp').textContent = ex; $('#lv').textContent = lvl(S.xp);
+      }
+      function lbHTML() {
+        var rows = S.bots.map(function (b) { return [b[0], b[1]] });
+        Object.keys(users).forEach(function (k) { rows.push([users[k].name, k === cur ? S.pts : users[k].d.pts, k === cur]) });
+        rows.sort(function (a, b) { return b[1] - a[1] });
+        var h = ''; rows.slice(0, 6).forEach(function (r, i) { h += '<tr class=' + (r[2] ? 'me' : 'x') + '><td>' + (i + 1) + '. ' + r[0] + (r[2] ? ' (you)' : '') + '</td><td>' + r[1] + '</td></tr>' }); return h;
+      }
+      function misHTML(full) {
+        var m = mis(), h = '';
+        MS.forEach(function (d, i) {
+          var v = Math.min(d[1], d[3](m)), done = v >= d[1], cl = m.cl[i];
+          h += '<div class=ms><div><b>' + d[0] + '</b><p class=mut>' + v + ' of ' + d[1] + ' · reward ' + d[2] + ' coins</p></div>';
+          h += full ? (cl ? '<span class=w>Claimed</span>' : '<button class=btn data-claim=' + i + (done ? '' : ' disabled') + '>Claim</button>') : '<span class=' + (cl || done ? 'w' : 'p') + '>' + (cl ? 'Claimed' : done ? 'Ready' : Math.round(v / d[1] * 100) + '%') + '</span>';
+          h += '<div class=bar><i style=\'width:' + Math.round(v / d[1] * 100) + '%\'></i></div></div>';
+        });
+        return h;
+      }
+      function renderCur() {
+        if (!S) return; updateTop();
+        var v = page();
+        if (v === 'home') renderHome(); else if (v === 'arena') renderArena(); else if (v === 'missions') $('#mlist').innerHTML = misHTML(true);
+        else if (v === 'me') renderMe(); else if (v === 'activity') renderAct();
+        var st = '';[10, 50, 100, 500].forEach(function (x) { st += '<button class=chip aria-pressed=' + (S.stake === x) + ' data-s=' + x + '>' + x + '</button>' });
+        document.querySelectorAll('.stk').forEach(function (e) { e.innerHTML = '<span>Stake (coins)</span>' + st });
+      }
+      function renderHome() {
+        var h = new Date().getHours(), L = lvl(S.xp), a = 40 * (L - 1) * (L - 1), b = 40 * L * L;
+        $('#hg').textContent = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening'; $('#hn').textContent = users[cur].name;
+        $('#xpf').style.width = Math.round((S.xp - a) / (b - a) * 100) + '%'; $('#xpt').textContent = 'Level ' + L + ' · ' + (b - S.xp) + ' XP to level ' + (L + 1);
+        var ok = Date.now() - S.spin >= 864e5; $('#spinb').disabled = !ok; $('#spint').textContent = ok ? 'Your daily spin is ready' : 'Next spin in about ' + Math.ceil((864e5 - (Date.now() - S.spin)) / 36e5) + 'h';
+        $('#hlive').innerHTML = '<div class=big style=\'font-size:40px\'>' + M.runs + '/' + M.w + '<small>' + Math.floor(M.balls / 6) + '.' + (M.balls % 6) + ' overs</small></div><p class=mut>Mumbai Meteors v Delhi Dynamos' + (M.ended ? ' · finished' : '') + '</p>';
+        $('#hmis').innerHTML = misHTML(false); $('#lb').innerHTML = lbHTML();
+        var u = '', n = 0; UP.forEach(function (m) { if (n < 4) { u += upRow(m); n++ } }); $('#hup').innerHTML = u;
+      }
+      function renderArena() {
+        $('#runs').textContent = M.runs; $('#wk').textContent = M.w; $('#ov').textContent = Math.floor(M.balls / 6) + '.' + (M.balls % 6) + ' overs';
+        var crr = M.balls ? M.runs / M.balls * 6 : 0; $('#crr').textContent = crr.toFixed(2); $('#proj').textContent = M.balls ? Math.round(crr * 20) : '–'; $('#tov').textContent = M.ovRuns;
+        var sh = '';
+        if (M.bio === 0 && M.lastOver != null) sh = '<span class=mut>Last over: ' + M.lastOver + ' runs</span>';
+        else M.over.forEach(function (l) { sh += '<span class=\'ball ' + (l === '4' || l === '6' ? 'b' + l : l === 'W' ? 'bw' : '') + '\'>' + l + '</span>' });
+        $('#strip').innerHTML = sh;
+        $('#phase').textContent = M.ended ? 'Match finished. Start a new match to keep playing.' : paused ? 'Paused' : M.bio === 0 ? 'Over break: runs-this-over predictions are open' : 'Ball in play';
+        var h = ''; Object.keys(MK).forEach(function (k) {
+          var m = MK[k], op = m.open();
+          h += '<div class=mk><div class=mkh>' + m.t + '<span>' + (op ? m.hint : 'closed') + '</span></div><div class=opts>';
+          m.o.forEach(function (o, i) { h += '<button class=opt data-m=' + k + ' data-i=' + i + (op ? '' : ' disabled') + '>' + o[0] + '<i>' + o[1].toFixed(1) + '×</i></button>' });
+          h += '</div></div>'
+        });
+        $('#markets').innerHTML = h; renderMO();
+        var bt = ''; S.bets.slice(0, 8).forEach(function (b) { bt += '<tr><td>' + b.label + ' <span class=p>(' + b.stake + ' @ ' + b.odds + '×)</span></td><td class=' + (b.st === 'won' ? 'w' : b.st === 'lost' ? 'l' : 'p') + '>' + (b.st === 'won' ? '+' + b.pay : b.st === 'lost' ? '−' + b.stake : 'open') + '</td></tr>' });
+        $('#bets').innerHTML = bt; $('#nobets').style.display = S.bets.length ? 'none' : 'block';
+        var lg = ''; M.log.forEach(function (l) { lg += '<li>' + l + '</li>' }); $('#log').innerHTML = lg;
+        var fs = ['All', 'T20', 'ODI', 'Test', 'Qualifier'], fh = ''; fs.forEach(function (f) { fh += '<button class=chip aria-pressed=' + (upf === f) + ' data-f=' + f + '>' + f + '</button>' }); $('#ufl').innerHTML = fh;
+        var out = ''; UP.forEach(function (m) { if (upf === 'All' || m[4] === upf) out += upRow(m) }); $('#ul').innerHTML = out || '<p class=note>No matches in this filter.</p>';
+      }
+      function renderMe() {
+        var L = lvl(S.xp), tot = S.w + S.l;
+        $('#mav').textContent = users[cur].name.charAt(0).toUpperCase(); $('#mav').style.background = AVC[S.av] || AVC[0];
+        $('#mn').textContent = users[cur].name; $('#ml').textContent = 'Level ' + L + ' · ' + S.xp + ' XP';
+        var sw = ''; AVC.forEach(function (c, i) { sw += '<button class=\'sw' + (S.av === i ? ' on' : '') + '\' data-av=' + i + ' aria-label=\'Avatar colour ' + (i + 1) + '\' style=\'background:' + c + '\'></button>' }); $('#msw').innerHTML = sw;
+        $('#sts').innerHTML = '<div><b>' + S.w + '</b>Won</div><div><b>' + S.l + '</b>Lost</div><div><b>' + (tot ? Math.round(S.w / tot * 100) : 0) + '%</b>Hit rate</div><div><b>' + S.streak + '</b>Streak</div><div><b>' + S.best + '</b>Best streak</div>';
+        var bh = ''; BD.forEach(function (b) { bh += '<div class=\'bd' + (S.bd.got[b[0]] ? '' : ' off') + '\'><em>' + b[1] + '</em>' + b[0] + '</div>' }); $('#bdg').innerHTML = bh;
+        $('#refill').disabled = !(S.pts < 50 && Date.now() - S.refill >= 216e5);
+      }
+      function fmt(t) { return new Date(t).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) }
+      function renderAct() {
+        var a = {}, T = [0, 0], h = '<tr><td class=p>Game</td><td class=p>Staked</td><td class=p>Returned</td><td class=p>Net</td></tr>';
+        S.led.forEach(function (r) { var o = a[r.g] || (a[r.g] = [0, 0]); if (r.a < 0) o[0] -= r.a; else o[1] += r.a });
+        function row(n, o) { var net = o[1] - o[0]; return '<tr><td>' + n + '</td><td>' + o[0] + '</td><td>' + o[1] + '</td><td class=' + (net >= 0 ? 'w' : 'l') + '>' + (net >= 0 ? '+' : '−') + Math.abs(net) + '</td></tr>' }
+        Object.keys(GN).forEach(function (k) { var o = a[k] || [0, 0]; T[0] += o[0]; T[1] += o[1]; h += row(GN[k], o) });
+        $('#lgtab').innerHTML = h + row('<b>Total</b>', T);
+        var s = '<tr><td class=p>Time</td><td class=p>Details</td><td class=p>Amount</td></tr>';
+        S.led.slice(0, 50).forEach(function (r) { s += '<tr><td>' + fmt(r.t) + '</td><td>' + (GN[r.g] || r.g) + ': ' + r.d + '<br><span class=p>Balance ' + r.b + '</span></td><td class=' + (r.a > 0 ? 'w' : 'l') + '>' + (r.a > 0 ? '+' : '−') + Math.abs(r.a) + '</td></tr>' });
+        $('#sttab').innerHTML = S.led.length ? s : ''; $('#stno').style.display = S.led.length ? 'none' : 'block';
+      }
+
+      /* ---------- events ---------- */
+      var tt; function toast(t, win) { var e = $('#toast'); e.textContent = t; e.className = 'toast on' + (win ? ' win' : ''); clearTimeout(tt); tt = setTimeout(function () { e.classList.remove('on') }, 2000) }
+      document.addEventListener('click', function (e) {
+        var t = e.target.closest('button'); if (!t || !S) return; var d = t.dataset;
+        if (d.go) { location.hash = d.go }
+        else if (d.s) { S.stake = +d.s; persist(); renderCur() }
+        else if (d.m) { place(d.m, +d.i) }
+        else if (d.mo) { moBet(d.mo.charAt(0), +d.mo.charAt(1)) }
+        else if (d.rb) { var r = RB[d.rb]; spin(r[0], r[1], r[2]) }
+        else if (t.id === 'rgo') { var raw = $('#rnum').value, k = +raw; if (raw === '' || !(k >= 0 && k <= 36 && k % 1 === 0)) { toast('Pick a number from 0 to 36'); return } spin('Number ' + k, 36, function (n) { return n === k }) }
+        else if (d.dt) { deal(d.dt) }
+        else if (t.id === 'avb') { avClick() }
+        else if (d.f) { upf = d.f; renderCur() }
+        else if (d.av) { S.av = +d.av; persist(); renderCur() }
+        else if (d.claim) { var i = +d.claim, m = mis(), df = MS[i]; if (df[3](m) >= df[1] && !m.cl[i]) { m.cl[i] = 1; credit('bonus', df[2], 'Mission: ' + df[0]); addXp(30); checkBadges(); persist(); renderCur(); toast('Mission complete: +' + df[2] + ' coins', true) } }
+      });
+      $('#spinb').onclick = luckySpin;
+      $('#logout').onclick = logout;
+      $('#refill').onclick = function () { if (S.pts < 50 && Date.now() - S.refill >= 216e5) { S.refill = Date.now(); credit('bonus', 200, 'Refill'); persist(); renderCur(); toast('Refill: +200 coins', true) } };
+      var rs = 0; $('#reset').onclick = function () {
+        if (!rs) { rs = 1; this.textContent = 'Tap again to confirm reset'; var b = this; setTimeout(function () { rs = 0; b.textContent = 'Reset all progress' }, 4000); return }
+        rs = 0; this.textContent = 'Reset all progress'; var f = newState(); f.mi = S.mi; S = f; users[cur].d = S; newMatch(); persist(); renderCur(); toast('Progress reset');
+      };
+      $('#pause').onclick = function () { paused = !paused; this.textContent = paused ? 'Resume' : 'Pause'; renderCur(); schedule() };
+      $('#speed').onclick = function () { speed = speed === 1 ? 3 : speed === 3 ? 6 : 1; this.textContent = 'Speed ' + speed + '×'; schedule() };
+      $('#newm').onclick = function () {
+        S.bets = S.bets.filter(function (b) { if (b.st === 'open') { S.pts += b.stake; led('arena', b.stake, 'Refund: ' + b.label); return false } return true });
+        newMatch(); paused = false; $('#pause').textContent = 'Pause'; persist(); renderCur(); schedule(); toast('New match started. Open stakes refunded.');
+      };
+      $('#theme').onclick = function () { var r = document.documentElement, d = r.getAttribute('data-theme'); var dark = d ? d === 'dark' : matchMedia('(prefers-color-scheme:dark)').matches; r.setAttribute('data-theme', dark ? 'light' : 'dark') };
+      $('#pwgo').onclick = function () {
+        var o = $('#pw0').value, n = $('#pw1').value, c = $('#pw2').value, u = users[cur], e = $('#pwerr');
+        if (n.length < 4) { e.textContent = 'New password needs at least 4 characters.'; return }
+        if (n !== c) { e.textContent = 'New passwords don’t match.'; return }
+        hash(o, u.salt).then(function (h) {
+          if (h !== u.h) { e.textContent = 'Current password is wrong.'; return }
+          var s = Math.random().toString(36).slice(2);
+          hash(n, s).then(function (h2) { u.salt = s; u.h = h2; persist(); e.textContent = ''; $('#pw0').value = ''; $('#pw1').value = ''; $('#pw2').value = ''; toast('Password changed') });
+        });
+      };
+      $('#form').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#submit').click() });
+      try { var ss = localStorage.getItem(SK); if (ss && users[ss]) { cur = ss; enter() } } catch (e) { }
+    })();
+  </script>
+</body>
+
+</html>
